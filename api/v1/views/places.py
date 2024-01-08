@@ -31,21 +31,24 @@ def places_search():
 
     place_ids = set()
 
+    # Include all places for each state listed
     for state_id in states:
         state = storage.get(State, state_id)
         if state:
             place_ids.update([place.id for city in state.cities for place in city.places])
 
+    # Include all places for each city listed
     for city_id in cities:
         city = storage.get(City, city_id)
         if city:
             place_ids.update([place.id for place in city.places])
 
+    places = [storage.get(Place, place_id) for place_id in place_ids if storage.get(Place, place_id)]
+
+    # Filter places based on amenities
     if amenities:
         amenities_set = set(amenities)
-        place_ids = [place_id for place_id in place_ids if amenities_set.issubset(place.amenities)]
-
-    places = [storage.get(Place, place_id) for place_id in place_ids if storage.get(Place, place_id)]
+        places = [place for place in places if amenities_set.issubset(place.amenities)]
 
     return jsonify([place.to_dict() for place in places])
 
