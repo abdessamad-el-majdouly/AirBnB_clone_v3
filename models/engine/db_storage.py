@@ -80,3 +80,14 @@ class DBStorage:
 
     def get(self, cls, id):
         """ Retrieve one object """
+        return self.__session.query(cls).get(id)
+
+    def count(self, cls=None):
+        """ Count the number of objects in storage """
+        if cls:
+            return self.__session.query(cls).count()
+        else:
+            count = 0
+            for model in [State, City, User, Place, Review, Amenity]:
+                count += self.__session.query(model).count()
+            return count
